@@ -450,10 +450,394 @@ paths:
               Cardholder:  "TEST CARD   /VISA"
               Result:  "CAPTURED"
               Authorization Code:  000271
-              description: "OK"
           description: Success
+  '/checkStatus':
+    get:
+      summary: checkStatus
+      description: |
+        The checkStatus method will return the json transaction response to any transaction provided you know the RefId. It’s meant to be used when you don’t receive a response due to a network issue or browser crash.It is HIGHLY recommended to run a checkstatus PRIOR to allowing the next transaction to finalize or update any pending transactions if a response has not been received.
+        
+        Additionally, we have added a flag to the response, ResultFinal, which indicates if the response you received is the end result. In cases of comm failures with the terminals, this value could be false. We recommend calling checkStatus at regular intervals when the ResultFinal flag is false. On some terminals, we are able to inspect the terminal to find out if the transaction was approved, provided it is back online. Please keep in mind that if the terminal is offline, the response won’t change and you probably don’t want to keep polling forever. If possible, it’s best to check every minute or so in the background so other functions can be done on the POS. **Do not constantly invoke the CheckStatus call in a continuous loop without pauses, this will cause alerts and your API credentials will be revoked. The max interval  is every 5 seconds for 3 minutes and every 30 seconds thereafter.**
+        
+        The RefID for the original transaction must have been passed to us in the initial request in order to use this feature.
+        
+        Command=Sale, Refund, Auth etc refID=refID of the transaction you are looking for the response on  date= date of the transaction in MMddYYYY format, ie. Jan 19, 2016 would be 01192016 – US Central tiimezone
+        
+        The only reason to use checkStatus2 is if you are using multi-mid applications in the terminal. Nothing else is different for the 2 calls except that checkStatus2 accepts a merchantId value.
+      parameters:
+        - name: command
+          type: string
+          in: query
+          required: true
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: refID
+          type: string
+          in: query
+          required: true
+        - name: date
+          type: string
+          in: query
+          required: true
+      tags:
+        - Endpoints
+      responses:
+        '200':
+          description: Success
+          examples:
+            application/json:
+              TerminalID: "1234"
+              ResultCode: "Approved"
+              AuthCode: "abc1234"
+              TransType: "checkStatus"
+              Amount: 2.50
+              AmountString: "2.50"
+              CardType: "Visa"
+              Last4: "0026"
+              Name: "John Doe"
+              CashBack: 0.00
+              CashBackString: "0.00"
+              Message: "This is a sample message"
+              RefID: "ee0252f6-38bf-4c3f-97d4-a3ecf87cf69b"
+              CardToken: "ASDF2134-AHRCW+FSD123123-NKODS"
+              GiftCardBalance: 23.75
+              GiftCardBalanceString: "23.75"
+              ProcessorExtraData1: "KaNb015170105002706cAAFEd5e00fJlA m000005"
+              ProcessorExtraData2: "|17|210100700000"
+              ProcessorExtraData3: "0058"
+              SignatureData: "iVBORw0KGgoAAAANSUhEUgAAAI4AAA<snipped>QmCC="
+              Track1: "null"
+              Track2: "null"
+              EMV_TC: "B9AB420B0937438F"
+              EMV_TVR: "0800008000"
+              EMV_AID: "A0000000031010"
+              EMV_TSI: "F800"
+              EMV_ATC: "0016"
+              EMV_App_Label: "Visa Credit"
+              EMV_App_Name: "Visa Credit"
+              CardBin: "476173"
+              ExpDate: "0117"
+              EntryMethod: "Chip"
+              receiptTerminal: "Payroc"
+              Client ID: 13318900010001
+              Cashier ID: "123"
+              Lane: "Store: 05/01/2015 16:56:25"
+              SALE: "123"
+              Invoice: 78
+              Account: "VISA 401200******0026"
+              Cardholder: "TEST CARD /VISA"
+              Result: "CAPTURED"
+              Authorization Code: 000271
+  '/checkStatus2':
+    get:
+      summary: checkStatus
+      description: |
+        The checkStatus method will return the json transaction response to any transaction provided you know the RefId. It’s meant to be used when you don’t receive a response due to a network issue or browser crash.It is HIGHLY recommended to run a checkstatus PRIOR to allowing the next transaction to finalize or update any pending transactions if a response has not been received.
+        
+        Additionally, we have added a flag to the response, ResultFinal, which indicates if the response you received is the end result. In cases of comm failures with the terminals, this value could be false. We recommend calling checkStatus at regular intervals when the ResultFinal flag is false. On some terminals, we are able to inspect the terminal to find out if the transaction was approved, provided it is back online. Please keep in mind that if the terminal is offline, the response won’t change and you probably don’t want to keep polling forever. If possible, it’s best to check every minute or so in the background so other functions can be done on the POS. **Do not constantly invoke the CheckStatus call in a continuous loop without pauses, this will cause alerts and your API credentials will be revoked. The max interval  is every 5 seconds for 3 minutes and every 30 seconds thereafter.**
+        
+        The RefID for the original transaction must have been passed to us in the initial request in order to use this feature.
+        
+        Command=Sale, Refund, Auth etc refID=refID of the transaction you are looking for the response on  date= date of the transaction in MMddYYYY format, ie. Jan 19, 2016 would be 01192016 – US Central tiimezone
+        
+        The only reason to use checkStatus2 is if you are using multi-mid applications in the terminal. Nothing else is different for the 2 calls except that checkStatus2 accepts a merchantId value.
+      parameters:
+        - name: command
+          type: string
+          in: query
+          required: true
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: refID
+          type: string
+          in: query
+          required: true
+        - name: date
+          type: string
+          in: query
+          required: true
+        - name: merchantID
+          type: string
+          in: query
+          required: true
+      tags:
+        - Endpoints
+      responses:
+        '200':
+          description: Success
+          examples:
+            application/json:
+              TerminalID: "1234"
+              ResultCode: "Approved"
+              AuthCode: "abc1234"
+              TransType: "checkStatus"
+              Amount: 2.50
+              AmountString: "2.50"
+              CardType: "Visa"
+              Last4: "0026"
+              Name: "John Doe"
+              CashBack: 0.00
+              CashBackString: "0.00"
+              Message: "This is a sample message"
+              RefID: "ee0252f6-38bf-4c3f-97d4-a3ecf87cf69b"
+              CardToken: "ASDF2134-AHRCW+FSD123123-NKODS"
+              GiftCardBalance: 23.75
+              GiftCardBalanceString: "23.75"
+              ProcessorExtraData1: "KaNb015170105002706cAAFEd5e00fJlA m000005"
+              ProcessorExtraData2: "|17|210100700000"
+              ProcessorExtraData3: "0058"
+              SignatureData: "iVBORw0KGgoAAAANSUhEUgAAAI4AAA<snipped>QmCC="
+              Track1: "null"
+              Track2: "null"
+              EMV_TC: "B9AB420B0937438F"
+              EMV_TVR: "0800008000"
+              EMV_AID: "A0000000031010"
+              EMV_TSI: "F800"
+              EMV_ATC: "0016"
+              EMV_App_Label: "Visa Credit"
+              EMV_App_Name: "Visa Credit"
+              CardBin: "476173"
+              ExpDate: "0117"
+              EntryMethod: "Chip"
+              receiptTerminal: "Payroc"
+              Client ID: 13318900010001
+              Cashier ID: "123"
+              Lane: "Store: 05/01/2015 16:56:25"
+              SALE: "123"
+              Invoice: 78
+              Account: "VISA 401200******0026"
+              Cardholder: "TEST CARD /VISA"
+              Result: "CAPTURED"
+              Authorization Code: 000271
+  '/closeBatch':
+    get:
+      summary: closeBatch
+      description: |
+        This method will attempt to settle the open batch in the terminal. Both the credit and gift batches are settled at the same time, you cannot settle them independently. Possible response codes
+        
+        * 1 – Batch close is not supported on the terminal 
+        * 0 – Batch closed failed, the message field will contain the reason is available. 
+        * 1 – Success – A batch with zero transactions usually returns a success code
+        
+        The response fields with total will have the combined amounts of both the credit and gift batches.
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: refID
+          type: string
+          in: query
+          required: true
+        - name: merchantId
+          type: string
+          in: query
+          required: true
+      responses:
+        '200':
+          description: Success
+          examples:
+            application/json:
+              TerminalID: 1372
+              RefID: "3423"
+              ResultCodeCredit: "1"
+              ResultCodeGift: "1"
+              MessageCredit: "APPROVED"
+              MessageGift: "Settled"
+              BatchNumCredit: "110"
+              BatchNumGift: "4"
+              TransCntTotal: 1
+              AmtTotal: 2.02
+              AmtTotalString: "2.02"
+              TransCntCredit: 1
+              AmtCredit: 2.02
+              AmtCreditString: "2.02"
+              TransCntGift: 0
+              AmtGift: 0
+              AmtGiftString: "0"
+  '/getSignature':
+    get:
+      summary: getSignature
+      description: |
+        The getSignature method will initiate a signature capture on the terminal without the need for a transaction. This is useful for when a signature is needed outside of a payment situation. Possibly for a work order or some other authorization where just a signature is required.
+        
+        This method is only supported on Pax and Dejavoo terminals which have a touchscreen and have been updated to a firmware that supports.
+
+        This method will return our standard transaction object which will have the signatureData field populated with a base64 encoded png file.
+
+        **(This method is not necessary for normal payment transactions as that happens automatically)**
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              TerminalID: 1372
+              ResultFinal: true
+              AuthCode: ""
+              TransType: "getSignature"
+              Amount": 0,
+              AmountString: null
+              CardType: null
+              Last4: null
+              Name: null
+              CashBack: 0
+              CashBackString: null
+              RefID: ""
+              receiptTerminal: null
+              CardToken: ""
+              GiftCardBalance: 0
+              GiftCardBalanceString: null
+              ProcessorExtraData1: null
+              ProcessorExtraData2: null
+              ProcessorExtraData3: null
+              SignatureData: "iVBORw0KGgoAAAANSUhEUgAAALoAAAB3AQMAAACOtsjYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURQAAAP///6XZn90AAAAJcEhZcwAADsQAAA7EAZUrDhsAAALJSURBVEjHjZY7kt4gDIDlceHSR/BRnJtBqlyLzBa5Bju5ANtRMBCJhxBeeSZ/89v+QG8k4KuoPwfhFVwvIO4vIMELKPZ+AeF4AWl7AQXMC/DXC1ANJpDhBTwNhmuAcC7fAe4OFoMdgq2DAlNWwvUW3xtwU5anRXB2EKcsoDXoQANTVuzvA7As1yLqTAfD+dy3hgFK//NdWWLg7ql6Ac35NDKQ7gFSVcLJnKApccPqPEH9xvEXgJSkXQH0cYZf6CAxM2ESuFukOJoJwimKQoJ0iDIKZYKyWaMDJzL/KYE//gN8SGCFqF2AvFn+ng8B4uHZ8XgK4K/IfoRbAGfSOZ8F+Ekq5zMD1Efvw6gJSI4z4nkA0hy6WdRFGHhTrWy6bwFc11P6mWRQFbeg1IQxOMa2XvoD5Cq+BaXWKZfoNUzrR3WAWNcmEtiqi6u9+VbV3gtof5SSfvg6+GI3e3UN8MnB8KcGMHz9eA7wt7uzj17wAMXao2ii8P3WARfXw9wAxwM0ByNs2xOYuh6ucRZkELHp7dyERdh97YXxYW4+Eq2fTZhTu9neeewakmKHoY8gYhvuD2kNewAu9dazuPUBl7qTOQ9wzxYhqwTXzyYm6go3iBlWe29v+rscCZGLOtXswCKrDZadPctE/b2MokgLa3GPozbiRpoqoAMkx52jQVO929YBmXE61YlWXGsy3NkwtS1QHnYEWcyhHkpM2g/gZMof7dVnMJJitamNwoo653FH1m4GGZVHXQVeWLRLhkM/gqYbsOl/ajZRSDTgqL1+KBvqPFcARdbBH2VDzeAvdYMG6gYEp7pBARFOHdjRrx7BHQflqTwDd5/VQQ98zn+vG3a2zZvFVMNPMlFpmoI3y1OaaibIu9B8CqHzBhEApDY+rhHgWkAYc2YJAl05q8YkekMHhZY6gLVU64mC+jPfQD1iz9tlS5f/lpXi/gHRf6dGMoClVAAAAABJRU5ErkJggg=="
+              Track1: null
+              Track2: null
+              EMV_TC: null
+              EMV_TVR: null
+              EMV_AID: null
+              EMV_TSI: null
+              EMV_ATC: null
+              EMV_App_Label: null
+              EMV_App_Name: null
+              EMV_ARC: null
+              EMV_CVM: -1
+              CardBin: null
+              EntryMethod: null
+              PaymentMethod: "Credit"
+              TransactionDate: "2017-05-19T14:16:34-05:00"
+              TransactionDateUtc: "2017-05-19T19:16:34Z"
+              InvoiceNumber: null
+              ExpDate: null
+              GiftPAN: null
+              ResultCode: null
+              Message: "OK"
+  '/getSwipe':
+    get:
+      summary: getSwipe
+      description: |
+        The getSwipe method allows you to use the terminal much like an MSR reader. This can be used if you need to swipe an admin card to log in a user or for your own gift card platform where you just need to the gift card number.
+
+        The prompt parameter is what is displayed on the terminal to prompt the user to swipe. While the command accepts any amount of characters, the display on the terminal is limited to 3 lines and it will break on spaces.
+
+        If a user manually enters a card number, then only the track1 field will return data. Be sure to test both swiping and manually entering as some cards will return data on track2 only and not track1.
+
+        **We cannot prevent users from swiping real credit cards when using this method. Use of the method should only be done with care since we will return a live credit card number if the user swipes a live credit card. This will open you up to PCI regulations.**
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: prompt
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Sucess
+          examples:
+            application/json:
+              TerminalID: 1372
+              ResultFinal: true
+              AuthCode: null
+              TransType: "getswipe"
+              Amount: 0
+              AmountString: null
+              CardType: null
+              Last4: null
+              Name: null
+              CashBack: 0
+              CashBackString: null
+              RefID: null
+              receiptTerminal: null
+              CardToken: null
+              GiftCardBalance: 0
+              GiftCardBalanceString: null
+              ProcessorExtraData1: null
+              ProcessorExtraData2: null
+              ProcessorExtraData3: null
+              SignatureData: null
+              Track1: "%B4XXXXXXXXXXXX2-BS6DLR-QD55?"
+              Track2: ";1582300193255026?"
+              EMV_TC: null
+              EMV_TVR: null
+              EMV_AID: null
+              EMV_TSI: null
+              EMV_ATC: null
+              EMV_App_Label: null
+              EMV_App_Name: null
+              EMV_ARC: null
+              EMV_CVM: -1
+              CardBin: null
+              EntryMethod: null
+              PaymentMethod: null
+              TransactionDate: "2017-05-19T14:12:06-05:00"
+              TransactionDateUtc: "2017-05-19T19:12:06Z"
+              InvoiceNumber: null
+              ExpDate: null
+              GiftPAN: null
+              ResultCode: "Success"
+              Message: null
     
     
+    
+
+
 ## models definition           
 definitions:
   pairTerminal:
