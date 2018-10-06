@@ -1,6 +1,5 @@
 # This is an **example** API to demontstrate features of OpenAPI specification.
 # It doesn't cover all OpenAPI features. For more full example check out: https://github.com/APIs-guru/petstore_extended
-
 swagger: '2.0'
 # You should specify common part of your endpoints in the following format:
 #   <schemes>://<host><basepath>
@@ -248,7 +247,214 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/pairTerminal'
-
+  '/runTransactions':
+    get:
+      summary: runTransactions
+      # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
+      description: | 
+        You would use this method to run a transaction on the terminal. To run different types of transactions, change the command value in the request.  Valid command values
+        
+        Sale, Refund, Auth, Capture, Void, TipAdjust, GiftActivate, GiftSale, GiftRefund, GiftAddValue, GiftBalance
+        
+        **In order to do a follow-up transaction (commands in italics), the batch needs to still be open and the RefId from the previous transaction needs to be sent instead of creating a new one. It is also recommended that you create a RefId value for all initial transactions as that will allow you to use the checkStatus() in the event of comm errors.**
+      
+      # operationId should be unique across the whole specification
+      tags:
+        - Endpoints
+      parameters:
+        - name: command
+          type: string
+          in: query
+          required: true
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: amount
+          type: number
+          in: query
+          required: true
+        - name: refID
+          type: integer
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+      produces:
+      - application/json;
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/runTransaction'
+          examples:
+            application/json:
+              TerminalID: "1234"
+              ResultCode: "Approved"
+              AuthCode: "abc1234"
+              TransType: "Sale"
+              Amount: 2.50
+              AmountString: "2.50"
+              CardType: "Visa"
+              Last4: "0026"
+              Name: "John Doe"
+              CashBack: 0.00
+              CashBackString: "0.00"
+              Message: "This is a sample message"
+              RefID: "ee0252f6-38bf-4c3f-97d4-a3ecf87cf69b"
+              CardToken: "ASDF2134-AHRCW+FSD123123-NKODS"
+              GiftCardBalance: 23.75
+              GiftCardBalanceString: "23.75"
+              ProcessorExtraData1: "KaNb015170105002706cAAFEd5e00fJlA m000005"
+              ProcessorExtraData2: "|17|210100700000"
+              ProcessorExtraData3: "0058"
+              SignatureData: "iVBORw0KGgoAAAANSUhEUgAAAI4AAAQmCC="
+              Track1: "null"  
+              Track2: "null"
+              EMV_TC: "B9AB420B0937438F"
+              EMV_TVR: "0800008000"
+              EMV_AID: "A0000000031010"
+              EMV_TSI: "F800"
+              EMV_ATC: "0016"
+              EMV_App_Label: "Visa Credit"
+              EMV_App_Name: "Visa Credit"
+              CardBin: "476173"
+              ExpDate: "0117"
+              EntryMethod: "Chip"
+              receiptTerminal: "Payroc"
+              Client ID:  13318900010001
+              Cashier ID: 
+              Lane: "123"                           
+              Store: "05/01/2015  16:56:25"
+              SALE: "123"
+              Invoice: 78
+              Account:  "VISA 401200******0026"
+              Cardholder:  "TEST CARD   /VISA"
+              Result:  "CAPTURED"
+              Authorization Code:  000271
+  '/runTransaction2':
+    get:
+      summary: runTransaction2
+      description:  | 
+        You would use this method to run a transaction on the terminal. The method is the same as runTransaction with the exception of having some additional fields, the return object is the same.
+        
+        invoiceNumber (When using Vantiv, this value will be sent to Vantiv)  merchantId (Used for Multi Mid applications, current only available in Dejavoo’s)  token – Supported on TSYS, FirstData RapidConnect and Vantiv. For Vantiv, the token can only be used a later date by integrating directly to the Vantiv gateway. For others, the token is run through the terminal. expDate – Needed when doing a token sale through TSYS or RapidConnect.
+      
+        None of these fields are required to have a value but they all need to be in the request. Please note that the amount needs to include the decimal point.
+      
+        **Using Tokens on TSYS and RapidConnect.**
+      
+        If tokenization is enabled in the terminal, Sale, Auth and Refund transactions will return a token and expiration date in the response. The token can be used to run a Sale, Auth or Refund at a later date without the card holder being present. TipAdjust, Capture and Void operate on the transaction level, which means that you are not using the token for these transactions but the RefId of the original transaction.
+      
+        To run different types of transactions, change the command value in the request.  Valid command values
+      
+        Sale, Refund, Auth, Capture, Void, TipAdjust, GiftActivate, GiftSale, GiftRefund, GiftAddValue, GiftBalance
+      
+        **In order to do a follow-up transaction (commands in italics), the batch needs to still be open and the RefId from the previous transaction needs to be sent instead of creating a new one. It is also recommended that you create a RefId value for all initial transactions as that will allow you to use the checkStatus() in the event of comm errors.**
+      
+      tags:
+        - Endpoints
+      parameters:
+        - name: command
+          type: string
+          in: query
+          required: true
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: amount
+          type: string
+          in: query
+          required: true
+        - name: refID
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: invoiceNumber
+          type: string
+          in: query
+          required: true
+        - name: merchantId
+          type: string
+          in: query
+          required: true
+        - name: token
+          type: string
+          in: query
+          required: true
+        - name: expDate
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          schema:
+            $ref: '#/definitions/runTransaction'
+          examples:
+            application/json:
+              TerminalID: "1234"
+              ResultCode: "Approved"
+              AuthCode: "abc1234"
+              TransType: "Sale"
+              Amount: 2.50
+              AmountString: "2.50"
+              CardType: "Visa"
+              Last4: "0026"
+              Name: "John Doe"
+              CashBack: 0.00
+              CashBackString: "0.00"
+              Message: "This is a sample message"
+              RefID: "ee0252f6-38bf-4c3f-97d4-a3ecf87cf69b"
+              CardToken: "ASDF2134-AHRCW+FSD123123-NKODS"
+              GiftCardBalance: 23.75
+              GiftCardBalanceString: "23.75"
+              ProcessorExtraData1: "KaNb015170105002706cAAFEd5e00fJlA m000005"
+              ProcessorExtraData2: "|17|210100700000"
+              ProcessorExtraData3: "0058"
+              SignatureData: "iVBORw0KGgoAAAANSUhEUgAAAI4AAAQmCC="
+              Track1: "null"  
+              Track2: "null"
+              EMV_TC: "B9AB420B0937438F"
+              EMV_TVR: "0800008000"
+              EMV_AID: "A0000000031010"
+              EMV_TSI: "F800"
+              EMV_ATC: "0016"
+              EMV_App_Label: "Visa Credit"
+              EMV_App_Name: "Visa Credit"
+              CardBin: "476173"
+              ExpDate: "0117"
+              EntryMethod: "Chip"
+              receiptTerminal: "Payroc"
+              Client ID:  13318900010001
+              Cashier ID: 
+              Lane: "123"                           
+              Store: "05/01/2015  16:56:25"
+              SALE: "123"
+              Invoice: 78
+              Account:  "VISA 401200******0026"
+              Cardholder:  "TEST CARD   /VISA"
+              Result:  "CAPTURED"
+              Authorization Code:  000271
+              description: "OK"
+          description: Success
+    
+    
+## models definition           
 definitions:
   pairTerminal:
       type: object
@@ -262,5 +468,97 @@ definitions:
             type: string
           Status:
             type: string
-          ErrorMessage:
-            type: string
+            
+  runTransaction:
+    type: object
+    description: runTransaction object result
+    properties:
+        TerminalID:
+          type: string
+        ResultCode:
+          type: string
+        AuthCode:
+          type: string
+        TransType:
+          type: string
+        Amount: 
+          type: number
+        AmountString: 
+          type: string
+        CardType:
+          type: string
+        Last4: 
+          type: string
+        Name:
+          type: string
+        CashBack:
+          type: number
+        CashBackString:
+          type: string
+        Message:
+          type: string
+        RefID:
+          type: string
+        CardToken:
+          type: string
+        GiftCardBalance:
+          type: number
+        GiftCardBalanceString:
+          type: string
+        ProcessorExtraData1:
+          type: string
+        ProcessorExtraData2:
+          type: string
+        ProcessorExtraData3:
+          type: string
+        SignatureData:
+          type: string
+        Track1:
+          type: string
+        Track2:
+          type: string
+        EMV_TC:
+          type: string
+        EMV_TVR:
+          type: string
+        EMV_AID:
+          type: string
+        EMV_TSI:
+          type: string
+        EMV_ATC:
+          type: string
+        EMV_App_Label:
+          type: string
+        EMV_App_Name:
+          type: string
+        CardBin:
+          type: string
+        ExpDate:
+          type: string
+        EntryMethod:
+          type: string
+        receiptTerminal:
+          type: string
+        Client ID:
+          type: integer
+        Cashier ID:
+          type: string
+        Lane:
+          type: string
+        Store:
+          type: string
+        SALE:
+          type: string
+        Invoice:
+          type: integer
+        Account:
+          type: string
+        Cardholder:
+          type: string
+        Result:
+          type: string
+        Authorization Code:
+          type: integer
+        description:
+          type: string
+      
