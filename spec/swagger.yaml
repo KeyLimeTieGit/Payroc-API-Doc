@@ -833,10 +833,259 @@ paths:
               GiftPAN: null
               ResultCode: "Success"
               Message: null
-    
-    
-    
+  '/unpairTerminal':
+    get:
+      summary: unpairTerminal
+      description: |
+        The unPairTerminal method clears the pairing information for the terminal so that it can be paired to a different client account. Typically this is only used for development.
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+      tags:
+        - Endpoints
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              TerminalID: 1
+              ApiKey: ""
+              ApiPassword: ""
+              Status: "Success"
+              ErrorMessage: null
+  '/getUserInput':
+    get:
+      summary: getUserInput
+      description: |
+        This method will prompt the user in front of a terminal to enter some information. The “Title” field is used as the prompt, i.e., Enter the tip amount or enter your phone number.  On Pax devices, the value of the title field has to match predefined options specified by Pax. Please contact us for a current list.
 
+        The type is the allowed entry characters
+        
+        * c=currency (Response will NOT have a decimal place included) 
+        * n=numeric only 
+        * a=alpha only 
+        * an=alphanumeric
+        * maxlength=number of characters to limit the user entry to
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: title
+          type: string
+          in: query
+          required: true
+        - name: type
+          type: string
+          in: query
+          required: true
+        - name: maxLength
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              TerminalID: 1082
+              UserInput: "200"
+              ResultCode: "Success"
+              Message: "Success"
+  '/getUserSelection':
+    get:
+      summary: getUserSelection
+      description: |
+        This method will allow the user to pick from a list of predefined options. For Example, 
+        Would you like to join our loyalty program or Would you like to add a tip? 
+        
+        * Yes 
+        * No
+
+        On Dejavoo’s, if the list of options is too long, the user can scroll up and down. On Pax, only the first 4 options are shown.
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: title
+          type: string
+          in: query
+          required: true
+        - name: options
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              TerminalID: 1082
+              UserInput: "Yes"
+              ResultCode: "Success"
+              Message: "Success"
+  '/setTerminalConfiguration':
+    get:
+      summary: setTerminalConfiguration
+      description: |
+        Some terminals allow for additional features to be enabled or disabled based on the terminal type. For instance, on Dejavoo terminals, you can enable a credit debit prompt.
+
+        Not all parameters are valid on all terminals and this list will expand as capabilities are added.
+
+        **Dejavoo**
+        
+        EnableCreditDebitPrompt (True or False) Will prompt the user to select credit or debit
+
+        **Pax**
+        
+        PaxGetSignature (True or False) – Will prompt for a signature after an approved transaction and add the result to the transaction response.
+
+        **All Terminals**
+        
+        WebHookUrl – This is not publicly available yet.
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+        - name: optionName
+          type: string
+          in: query
+          required: true
+        - name: optionValue
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              ResultCode: "Success"
+              Message: "Operation has been done successfully"
+  '/getTerminalConfiguration':
+    get:
+      summary: getTerminalConfiguration
+      description: This method will return the current values for any parameters that have been set using the setTerminalConfiguration method.
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+      responses:
+        200:
+          description: Success
+          examples:
+            application/json:
+              ResultCode: "Success"
+              Message: ""
+              TerminalParameters: 
+                [{
+                    Name: "EnableCreditDebitPrompt",
+                    Value: "True",
+                    DataType: "boolean"
+                  },
+                  {
+                    Name: "WebHookUrl",
+                    Value: "http://xxx.com/WebhookTester",
+                    DataType: "string"
+                }]
+  '/getTerminalFeatures':
+    get:
+      summary: getTerminalFeatures
+      description: |
+        This method will allow you to determine what features are available on the terminal. Some terminals do not support signature capture, batch closing, getSwipe etc. By using this method, you can dynamically hide those features so they are not shown to end users when they are not applicable.
+      tags:
+        - Endpoints
+      parameters:
+        - name: key
+          type: string
+          in: query
+          required: true
+        - name: password
+          type: string
+          in: query
+          required: true
+        - name: terminalId
+          type: string
+          in: query
+          required: true
+      responses:
+        '200':
+          description:  Success
+          examples:
+            application/json:
+              TerminalID: 1372
+              TerminalType: "Dejavoo"
+              TerminalModel: ""
+              Sale: true
+              Refund: true
+              Void: true
+              TipAdjust: true
+              Auth: true
+              Capture: true
+              GetSwipe: true
+              GiftActivate: true
+              GiftSale: true
+              GiftRefund: true
+              GiftAddValue: true
+              GiftBalance: true
+              GiftVoid: true
+              GetUserInput: true
+              GetUserSelection: true
+              GetIndependentSignature: true
+              BatchClose: true
 
 ## models definition           
 definitions:
