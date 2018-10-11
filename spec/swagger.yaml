@@ -247,9 +247,9 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/pairTerminal'
-  '/runTransactions':
+  '/runTransaction':
     get:
-      summary: runTransactions
+      summary: runTransaction
       # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
       description: | 
         You would use this method to run a transaction on the terminal. To run different types of transactions, change the command value in the request.  Valid command values
