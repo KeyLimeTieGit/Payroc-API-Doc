@@ -15,6 +15,21 @@ info:
     In order to start testing, please [contact](mailto:integrations@payroc.com) us to obtain a reseller id.  Once you have the reseller id you would first call the **pairTerminal()** method of the api which will return an API Key/Pwd and terminalID which you would store on your end. You would then use those credentials with the runTransaction method to run a sale. Please be sure to read the area in red on the pairing page as it describes the importance of the referenceID when calling the pairTerminal method. 
     
     All commands require a key, pwd and terminalID parameter which is obtained from the pairTerminal method
+    # Best Practices
+    From experience, the following testing cases should be performed to address different payment scenarios.
+    
+    The Blackline eConduit platform removes integrators from PCI PA-DSS scope and EMV certifications, it is not required although recommended to ensure a smooth experience for all clients.
+    
+    
+    | Item | Recommendation | Reference in documentation |
+    |-----|-----|-------|
+    | Payment Window  | It is important that you do not allow users to close the payment window. If a transaction needs to be cancelled, it must be initiated on the terminal itself. If a transaction is sent and the payment window is closed, the transaction is still showing on the terminal and a customer will typically complete it. Depending on the implementation, this can cause the result to be lost in the POS. Typically a cashier will then run a second transaction which is now a duplicate payment.   | [Check Status](#tag/Endpoints%2Fpaths%2F~1checkStatus%2Fget) |
+    | ResellerName | Prior to going live, ensure your ResellerName is provided to eConduit and added to the boarding request | [Pair Terminal](#operation/pairTerminal) |
+    | Partial Authorizations | Although an amount can be submitted for payment, an approval less than the actual amount can be approved.<br/><br/>Ensure your integration can accept approval for the full amount of less than the full amount requiring a second payment command | [Transaction Results](http://econduit.cloud/docs/api/transaction-results/) |
+    | Single device and multiple cash registers | When pairing devices to cash registers, it is recommended to pair one cash register to one device. Pairing multiple registers to a single device is allowed although it is recommended a second command is held until the device is free. Creating a backlog of commands to the device can create confusion. | &nbsp; |
+    | Client Boarding/Pairing | Pairing the device to your POS should be automated (not manual)<br/><br/>Also, the client information should be passed during the boarding process, not hard coded fields – it improves support by being able to pull up records by business name | [Pair Terminal](#operation/pairTerminal) |
+    | Transaction Error – Reference ID | If loss of connection, the use of CheckStatus should be used. CheckStatus will initiate a search in the device for the results.<br/><br/>It is recommended that the same transaction and amount is not allowed a 2nd time prior to initiating a CheckStatus. | You should keep calling the checkStatus until the resultFinal field is true. Please see the checkStatus area in red.<br/>[Check Status](#tag/Endpoints%2Fpaths%2F~1checkStatus%2Fget) |
+    | UnpairTerminal | If the need to unPairTerminals is common for support purposes, consider implementing the unPairTerminal command, it will allow you to remove pairing of devices to registers | [Unpair Terminal](#tag/Endpoints%2Fpaths%2F~1unpairTerminal%2Fget) |
   version: '1.0.0' # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
