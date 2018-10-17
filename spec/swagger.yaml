@@ -30,6 +30,68 @@ info:
     | Client Boarding/Pairing | Pairing the device to your POS should be automated (not manual)<br/><br/>Also, the client information should be passed during the boarding process, not hard coded fields – it improves support by being able to pull up records by business name | [Pair Terminal](#operation/pairTerminal) |
     | Transaction Error – Reference ID | If loss of connection, the use of CheckStatus should be used. CheckStatus will initiate a search in the device for the results.<br/><br/>It is recommended that the same transaction and amount is not allowed a 2nd time prior to initiating a CheckStatus. | You should keep calling the checkStatus until the resultFinal field is true. Please see the checkStatus area in red.<br/>[Check Status](#tag/Endpoints%2Fpaths%2F~1checkStatus%2Fget) |
     | UnpairTerminal | If the need to unPairTerminals is common for support purposes, consider implementing the unPairTerminal command, it will allow you to remove pairing of devices to registers | [Unpair Terminal](#tag/Endpoints%2Fpaths%2F~1unpairTerminal%2Fget) |
+    
+    # Testing Recommendations
+    
+    The following are recommended test cases to complete before going live.
+    
+    | Command | Type |
+    |-----|-----|
+    | Sale | swiped |
+    | Sale | Keyed |
+    | Sale | NFC (Apple Pay) |
+    | Sale | EMV (EMV gift cards needed) |
+    | Refund | Swiped |
+    | Refund | Keyed |
+    | Refund | NFC |
+    | Refund | EMV |
+    | Cancellation | Cancellation of transaction at credit card terminal |
+    | Void | Void a transaction still in the device |
+    | Tip Adjustment (restaurant application required) | Ability to adjust tips after the sale |
+    | GetSwipe (optional) | Command to allow you to grab non-sensitive data from the device |
+    | CheckStatus | Perform a checkStatus command to obtain the results of a previous transaction |
+    
+    # Receipt Formatting Recommendations
+    The following are receipt formatting recommendations for standard payments and EMV payments.
+    
+    ##  Magnetic Stripe Recommendations
+    * Payment type (card brand)
+    
+      * Last four digits of card
+      * Transaction type (sale, refund, etc.)
+      * Remove expiration date or truncate
+      * Entry mode (keyed, swiped)
+      * Approval code
+      * Transaction amount
+      * Card issues agreement language
+      * Refund policy near signature line
+      * Signature line
+      * Cardholder name as it appears in track data (requirement for Discover)
+    
+        ![alt sample](http://econduit.cloud/wp-content/uploads/2018/04/receipt-MagSwipe.png)
+    
+    ## EMV Receipt Recommendations
+    
+    * Transaction type (sale, refund, etc.)
+    
+      * Last four digits of the card
+      * Application Preferred Name or Application Label
+      * Application Identifier (AID)
+      * Application Cryptogram type (ARQC or TC)
+      * Application Cryptogram
+      * Terminal Verification Result (TVR) if available
+      * Transaction Status Information (TSI) if available
+      * Application Transaction Counter (ATC) if available
+      * Authorization Response Code (ARC) if available
+      * Approval Code
+      * Transaction amount
+      * Card issuer agreement language, if applicable
+      * Refund policy near signature line, if applicable
+      * Card Verification method (signature line, pin verified, or no signature required)
+      * Cardholder name as it appears in track data
+      
+      ![alt sample](http://econduit.cloud/wp-content/uploads/2018/04/receipt-EMV.png)
+    
   version: '1.0.0' # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
