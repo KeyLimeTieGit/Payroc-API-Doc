@@ -25,7 +25,7 @@ info:
     |-----|-----|-------|
     | Payment Window  | It is important that you do not allow users to close the payment window. If a transaction needs to be cancelled, it must be initiated on the terminal itself. If a transaction is sent and the payment window is closed, the transaction is still showing on the terminal and a customer will typically complete it. Depending on the implementation, this can cause the result to be lost in the POS. Typically a cashier will then run a second transaction which is now a duplicate payment.   | [Check Status](#tag/Endpoints%2Fpaths%2F~1checkStatus%2Fget) |
     | ResellerName | Prior to going live, ensure your ResellerName is provided to eConduit and added to the boarding request | [Pair Terminal](#operation/pairTerminal) |
-    | Partial Authorizations | Although an amount can be submitted for payment, an approval less than the actual amount can be approved.<br/><br/>Ensure your integration can accept approval for the full amount of less than the full amount requiring a second payment command | [Transaction Results](http://econduit.cloud/docs/api/transaction-results/) |
+    | Partial Authorizations | Although an amount can be submitted for payment, an approval less than the actual amount can be approved.<br/><br/>Ensure your integration can accept approval for the full amount of less than the full amount requiring a second payment command | [Transaction Results](#section/Transaction-Results) |
     | Single device and multiple cash registers | When pairing devices to cash registers, it is recommended to pair one cash register to one device. Pairing multiple registers to a single device is allowed although it is recommended a second command is held until the device is free. Creating a backlog of commands to the device can create confusion. | &nbsp; |
     | Client Boarding/Pairing | Pairing the device to your POS should be automated (not manual)<br/><br/>Also, the client information should be passed during the boarding process, not hard coded fields – it improves support by being able to pull up records by business name | [Pair Terminal](#operation/pairTerminal) |
     | Transaction Error – Reference ID | If loss of connection, the use of CheckStatus should be used. CheckStatus will initiate a search in the device for the results.<br/><br/>It is recommended that the same transaction and amount is not allowed a 2nd time prior to initiating a CheckStatus. | You should keep calling the checkStatus until the resultFinal field is true. Please see the checkStatus area in red.<br/>[Check Status](#tag/Endpoints%2Fpaths%2F~1checkStatus%2Fget) |
@@ -91,6 +91,103 @@ info:
       * Cardholder name as it appears in track data
       
       ![alt sample](http://econduit.cloud/wp-content/uploads/2018/04/receipt-EMV.png)
+      
+    # Transaction Results
+    The transaction results will be returned in a JSON string.
+    
+    | Field | Description |
+    | --- | --- |
+    | TerminalId | Echo back original TerminalID provided |
+    | ResultCode | "Approved”, "Declined","Error","Connection Timeout","Terminal Busy","Cancelled" If using the getSwipe command, “Success” will be returned. |
+    | ResultFinal | Indicates if the result is the end result or not.In cases of comm failures, this will be false, normally it will be true |
+    | AuthCode | Authorization code provided by authorization network |
+    | TransType | Sale,Refund,Void etc |
+    | Amount | Amount Paid, could be less than what was requested (decimal) |
+    | AmountString | Amount Paid , could be less than what was requested (string) |
+    | CardType | “Visa”, ”MasterCard”, ”Discover”, ”Amex”, ”JCB”, ”DinersClub”, ”enRoute”, ”Interac”, ”Flash”, ”Debit”, ”GiftCard”, ”EBT”, ”LevelUp”, ”Voyager”, ”Wex”, ”Other” |
+    | Last4 | The last 4 digits of the card number |
+    | Name | Name on the credit card |
+    | CashBack | Cash back amount (decimal) |
+    | CashBackString | Cash back amount (string) |
+    | Message | Any error message returned from the terminal. |
+    | RefID | Echo back original RefID if one is provided, otherwise one is created. If a tip adjustment or void is required, this value must be saved and passed in the tip adjustment command. |
+    | receiptTerminal | 	If the terminal supports sending the receipt in the response, the receipt will be provided here. This data can include carriage returns and line feeds. |
+    | CardToken | Supported on Vantiv using Dejavoo. On Pax, TSYS and RapidConnect. |
+    | GiftCardBalance | The balance remaining on the gift card (decimal) |
+    | GiftCardBalanceString | The balance remaining on the gift card (string) |
+    | ProcessorExtraData1 | This field will vary depending on the processor. For Mercury, this will have the AcqRefData |
+    | ProcessorExtraData2 | This field will vary depending on the processor. For Mercury, this will have the ProcessData |
+    | ProcessorExtraData3 | This field will vary depending on the processor. For Mercury, this will have the Refno |
+    | SignatureData | If the device supports signature capture, this field will be populated with a base64 string that contains a png file. |
+    | EMV_TC | EMV Transaction Certificate |
+    | EMV_TVR | EMV Terminal Verification Results |
+    | EMV_AID | EMV Application Identifier |
+    | EMV_TSI | EMV Transaction Status Information |
+    | EMV_ATC | EMV Application Transaction Counter |
+    | EMV_App_Label | EMV Application Label |
+    | EMV_App_Name | 	EMV Application Name |
+    | EMV_CVM | EMV CVM – Integer response value<br/>-1 Undefined (not part of the terminal response)<br/>0 No CVM<br/>1 Verified by PIN<br/>2 Signature Required<br/>3 PIN and Signature Required<br/>4 Failed
+    | EMV_ARC | 	EMV Authorization Response Code |
+    | CardBin | Card bin number, first 6 digits of the card |
+    | EntryMethod | Manual, Swipe, Contactless, Scanner, Chip, ChipFallbackSwipe |
+    | TransactionDate | local transaction time (central US), ISO 8601 format. Example 2016-08-25T15:28:11-05:00 |
+    | TransactionDateUtc | UTC tranaction date, ISO 8601 format. Example 2016-08-25T20:28:11Z |
+    | ExpDate | 	If the expiration date is available, it will be returned. Format = MMYY, i.e. January 2017 would be 0117 |
+    | GiftPAN | On gift card transactions, if the full gift card number is available, it will be returned. |
+    
+    **JSON Response**
+    
+    ```
+    {
+      "TerminalID": "1234",
+      "ResultCode": "Approved",
+      "AuthCode": "abc1234",
+      "TransType": "Sale",
+      "Amount": 2.50,
+      "AmountString":"2.50",
+      "CardType": "Visa",
+      "Last4": "0026",
+      "Name": "John Doe",
+      "CashBack": 0.00,
+      "CashBackString": "0.00",
+      "Message": "This is a sample message",
+      "RefID": "ee0252f6-38bf-4c3f-97d4-a3ecf87cf69b",
+      "CardToken":"ASDF2134-AHRCW+FSD123123-NKODS",
+      "GiftCardBalance":23.75,
+      "GiftCardBalanceString":"23.75",
+      "ProcessorExtraData1":"KaNb015170105002706cAAFEd5e00fJlA m000005",
+      "ProcessorExtraData2":"|17|210100700000",
+      "ProcessorExtraData3":"0058",
+      "SignatureData":"iVBORw0KGgoAAAANSUhEUgAAAI4AAAQmCC=",
+      "Track1": null,
+      "Track2": null,
+      "EMV_TC": "B9AB420B0937438F",
+      "EMV_TVR": "0800008000",
+      "EMV_AID": "A0000000031010",
+      "EMV_TSI": "F800",
+      "EMV_ATC": "0016",
+      "EMV_App_Label": "Visa Credit",
+      "EMV_App_Name": "Visa Credit",
+      "CardBin": "476173",
+      "ExpDate":"0117",
+      "EntryMethod": "Chip",
+      "receiptTerminal":"Blackline Partners
+
+        Client ID:  13318900010001
+        Cashier ID: 
+        Lane:                            Store: 
+         
+        05/01/2015                      16:56:25
+         
+                          SALE
+                        Invoice: 78
+         
+        Account:  VISA 401200******0026
+        Cardholder:  TEST CARD   /VISA
+        Result:  CAPTURED
+        Authorization Code:  000271
+    }
+    ```
     
   version: '1.0.0' # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
